@@ -18,12 +18,21 @@ def combine_files_to_clipboard(root_dir, extension):
         for filename in filenames:
             if filename.endswith(extension):
                 filepath = os.path.join(dirpath, filename)
-                with open(filepath, "r", encoding="utf-8-sig") as infile:
-                    combined_text += infile.read()
-                    combined_text += "\n"  # Add a newline between files
+                print(f"Processing: {filepath}")  # Print the filename for debugging
+                with open(filepath, "rb") as infile:  # Open in binary mode
+                    content = infile.read()
+                    try:
+                        content = content.decode("utf-8-sig")  # Try UTF-8 with BOM
+                    except UnicodeDecodeError:
+                        content = content.decode("latin-1", errors="replace")  # Fallback to Latin-1 and replace undecodable characters
+                    if content.startswith('\ufeff'):  # Check for BOM
+                        content = content[3:]  # Remove BOM if present
+                    combined_text += content
+                    combined_text += "\n"
 
     pyperclip.copy(combined_text)
     print(f"Combined text from all {extension} files copied to clipboard!")
+
 
 basename = os.path.basename(__file__)
 print(basename)
