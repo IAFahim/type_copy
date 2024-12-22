@@ -38,3 +38,7 @@ Combined length: 163 from all {'cs', 'md', 'py'} total:7 files copied to clipboa
 Tutorial Video:
 
 [Recording 2024-12-23 021135.mp4](docs/Recording%202024-12-23%20021135.mp4)
+
+Bonus: try it with https://learn.microsoft.com/en-us/windows/dev-home/ 
+it unlocks this:
+![image](https://github.com/user-attachments/assets/d060ff72-2520-437d-b723-e4989dbe93c6)
