@@ -34,3 +34,7 @@ Combined length: 163 from all {'cs', 'md', 'py'} total:7 files copied to clipboa
 [Requirements:](requirements.txt)
 - Python installed
 - pyperclip
+
+Tutorial Video:
+
+[Recording 2024-12-23 021135.mp4](docs/Recording%202024-12-23%20021135.mp4)
