@@ -2,6 +2,18 @@
 
 #### Goes through all the files and folder in same folder and its sub folder and copies them to clipboard
 
+## instructions
+Copy and paste this file [copy.cs.md.py.py](copy.cs.md.py.py) to any folder and run it. It will copy all files with the extensions you specify to the clipboard.
+
+For example, if `copy.py` script has the following extensions before end of `.py`:
+```
+extensions = {'cs', 'md', 'py'} => copy.cs.md.py.py
+All Files with .cs, .md, .py extensions will be copied to clipboard
+```
+
+The extensions of file you want to copy, put those extension in between the `copy.{extensions}.py` seprated by (.)dot. The script will go through all the files in current folder and its subfolders. And Copy them to the clipboard.
+
+
 ![Type Copy visual.png](docs/Type%20Copy%20visual.png)
 
 Example of usage:
@@ -19,6 +31,6 @@ Processing: D:\type_copy\FolderTest\README.md
 Combined length: 163 from all {'cs', 'md', 'py'} total:7 files copied to clipboard!
 ```
 
-Requirements:
+[Requirements:](requirements.txt)
 - Python installed
 - pyperclip
