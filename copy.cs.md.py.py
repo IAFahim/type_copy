@@ -42,10 +42,12 @@ def combine_files_to_clipboard(root_dir, extension: set[str], detection_script_f
         f"Combined length: {len(combined_text)} from all {extension} total:{file_added} files copied to clipboard!")
 
 
-print(__file__)
-basename = os.path.basename(__file__)
-print(basename)
-# take all files with the same extension as the current file .py
-file_extensions = set(basename.split(".")[1:-1])
-print(file_extensions)
-combine_files_to_clipboard(os.getcwd(), file_extensions, basename)
+
+if __name__ == "__main__":
+    print(__file__)
+    basename = os.path.basename(__file__)
+    print(basename)
+    # take all files with the same extension as the current file .py
+    file_extensions = set(basename.split(".")[1:-1])
+    print(file_extensions)
+    combine_files_to_clipboard(os.getcwd(), file_extensions, basename)

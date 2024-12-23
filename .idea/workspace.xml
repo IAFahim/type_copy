@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="110665de-785c-4989-ae38-5ec07946982a" name="Changes" comment="Added video to README.md" />
+    <list default="true" id="110665de-785c-4989-ae38-5ec07946982a" name="Changes" comment="Removed clutter" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,6 +107,7 @@
       <workItem from="1726654518956" duration="1336000" />
       <workItem from="1734883759252" duration="4018000" />
       <workItem from="1734890294431" duration="4984000" />
+      <workItem from="1734900994188" duration="97000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
@@ -156,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734900529541</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Removed clutter">
+      <option name="closed" value="true" />
+      <created>1734901065817</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1734901065817</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -168,7 +177,8 @@
     <MESSAGE value="utf-8-sig + Latin-1 support + mulitple type support + docs" />
     <MESSAGE value="Better README.md" />
     <MESSAGE value="Added video to README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added video to README.md" />
+    <MESSAGE value="Removed clutter" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed clutter" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

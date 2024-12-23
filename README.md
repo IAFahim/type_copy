@@ -19,16 +19,14 @@ The extensions of file you want to copy, put those extension in between the `cop
 Example of usage:
 
 ```
+D:\type_copy\copy.cs.md.py.py
 copy.cs.md.py.py
-{'cs', 'md', 'py'}
-Processing: D:\type_copy\test.cs
-Processing: D:\type_copy\test.md
-Processing: D:\type_copy\test.py
-Processing: D:\type_copy\FolderTest\dir.test.cs
-Processing: D:\type_copy\FolderTest\dir.test.md
-Processing: D:\type_copy\FolderTest\dir.test.py
-Processing: D:\type_copy\FolderTest\README.md
-Combined length: 163 from all {'cs', 'md', 'py'} total:7 files copied to clipboard!
+{'md', 'py', 'cs'}
+Processing: D:\type_copy\README.md
+Processing: D:\type_copy\test\dir.test.cs
+Processing: D:\type_copy\test\dir.test.md
+Processing: D:\type_copy\test\dir.test.py
+Combined length: 1706 from all {'md', 'py', 'cs'} total:4 files copied to clipboard!
 ```
 
 [Requirements:](requirements.txt)
