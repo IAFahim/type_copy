@@ -42,11 +42,11 @@ def combine_files_to_clipboard(root_dir, extension: set[str], basename: str) -> 
 
 if __name__ == "__main__":
     print(__file__)
-    basename = os.path.basename(__file__)
-    print(basename)
+    this_base_name = os.path.basename(__file__)
+    print(this_base_name)
     # take all files with the same extension as the current file .py
-    file_extensions = set(basename.split(".")[1:-1])
+    file_extensions = set(this_base_name.split(".")[1:-1])
     print(file_extensions)
-    file_added, combined_text = combine_files_to_clipboard(os.getcwd(), file_extensions, basename)
+    file_added, combined_text = combine_files_to_clipboard(os.getcwd(), file_extensions, this_base_name)
     pyperclip.copy(combined_text)
     print(f"Combined length: {len(combined_text)} from all {file_extensions} total:{file_added} files copied to clipboard!")
