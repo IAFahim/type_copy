@@ -2,7 +2,7 @@ import os
 import pyperclip  # Install this library: pip install pyperclip
 
 
-def combine_files_to_clipboard(root_dir, extension: set[str], detection_script_file: str):
+def combine_files_to_clipboard(root_dir, extension: set[str], basename: str) -> (int, str):
     """
     Combines all files with a specific extension from a root directory and its
     subdirectories (including nested subdirectories) into a string and copies
@@ -37,10 +37,7 @@ def combine_files_to_clipboard(root_dir, extension: set[str], detection_script_f
                 combined_text += content
                 combined_text += "\n"
 
-    pyperclip.copy(combined_text)
-    print(
-        f"Combined length: {len(combined_text)} from all {extension} total:{file_added} files copied to clipboard!")
-
+    return file_added, combined_text
 
 
 if __name__ == "__main__":
@@ -50,4 +47,6 @@ if __name__ == "__main__":
     # take all files with the same extension as the current file .py
     file_extensions = set(basename.split(".")[1:-1])
     print(file_extensions)
-    combine_files_to_clipboard(os.getcwd(), file_extensions, basename)
+    file_added, combined_text = combine_files_to_clipboard(os.getcwd(), file_extensions, basename)
+    pyperclip.copy(combined_text)
+    print(f"Combined length: {len(combined_text)} from all {file_extensions} total:{file_added} files copied to clipboard!")
