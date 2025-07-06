@@ -33,11 +33,12 @@ Combined length: 1706 from all {'md', 'py', 'cs'} total:4 files copied to clipbo
 - Python installed
 - pyperclip
 
-## For linux
+## For Linux
+You don't even need this libary
 ```bash
 find . -type f \( -name "*.cs" -o -name "*.md" \) -exec cat {} \; | xclip -selection clipboard
 ```
-Note: need xclip installed
+Note: need xclip installed for unix
 
 
 ## Tutorial Video:
