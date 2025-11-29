@@ -1,52 +1,151 @@
 import os
-import pyperclip  # Install this library: pip install pyperclip
+import sys
+import time
 
+# Try to import pyperclip
+try:
+    import pyperclip
+except ImportError:
+    print("Error: 'pyperclip' is not installed.")
+    print("Please run: pip install pyperclip")
+    input("Press Enter to exit...")
+    sys.exit(1)
 
-def combine_files_to_clipboard(root_dir, extension: set[str], basename: str) -> (int, str):
-    """
-    Combines all files with a specific extension from a root directory and its
-    subdirectories (including nested subdirectories) into a string and copies
-    it to the clipboard.
+# --- CONFIGURATION & MAPPINGS ---
+# Map extensions to Markdown languages for syntax highlighting
+LANG_MAP = {
+    ".cs": "csharp", ".js": "javascript", ".ts": "typescript", ".py": "python",
+    ".java": "java", ".cpp": "cpp", ".h": "cpp", ".c": "c",
+    ".html": "html", ".css": "css", ".scss": "scss", ".xml": "xml",
+    ".yaml": "yaml", ".yml": "yaml", ".json": "json", ".md": "markdown",
+    ".sh": "bash", ".sql": "sql", ".shader": "glsl", ".hlsl": "glsl"
+}
 
-    Args:
-        root_dir: The root directory to search for files.
-        extension: The file extension to look for (e.g., ".cs").
-    """
+# Always ignore these specific junk files/folders
+IGNORE_FOLDERS = {".git", ".vs", ".idea", "Library", "Temp", "obj", "Builds", "__pycache__", "node_modules"}
+IGNORE_FILES = {".DS_Store", "Thumbs.db"}
 
-    combined_text = ""
-    file_added = 0
+def get_target_extensions():
+    """Parses filename 'copy.cs.js.py' -> {'.cs', '.js'}"""
+    name = os.path.basename(__file__)
+    parts = name.split('.')
+    if len(parts) < 3: return set()
+    
+    # Get everything between first name and last extension
+    exts = set()
+    for p in parts[1:-1]:
+        exts.add("." + p.lower())
+    return exts
+
+def format_size(bytes_size):
+    """Returns human readable size"""
+    for unit in ['B', 'KB', 'MB', 'GB']:
+        if bytes_size < 1024.0:
+            return f"{bytes_size:.2f} {unit}"
+        bytes_size /= 1024.0
+    return f"{bytes_size:.2f} TB"
+
+def process_directory(root_dir, target_exts):
+    output_content = ""
+    file_list = [] # For the "Project Structure" section
+    total_files = 0
+    total_bytes = 0
+
+    print(f"\033[96mScanning: {root_dir}...\033[0m") # Cyan text
+    
     for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Filter directories in-place
+        dirnames[:] = [d for d in dirnames if d not in IGNORE_FOLDERS]
+        
         for filename in filenames:
-            if filename == basename:
+            # Skip this script
+            if filename == os.path.basename(__file__): continue
+            if filename in IGNORE_FILES: continue
+
+            # Extension Logic
+            _, ext = os.path.splitext(filename)
+            ext = ext.lower()
+
+            # Strict Meta Check: Only allow .meta if explicitly requested
+            if ext == ".meta" and ".meta" not in target_exts:
                 continue
-            ext = os.path.splitext(filename)[1][1:]  # Get the file extension without the dot
-            if ext not in extension:
-                continue
-            file_added += 1
-            filepath = os.path.join(dirpath, filename)
-            print(f"Processing: {filepath}")  # Print the filename for debugging
-            with open(filepath, "rb") as infile:  # Open in binary mode
-                content = infile.read()
+
+            # Check if extension matches
+            if ext in target_exts:
+                filepath = os.path.join(dirpath, filename)
+                rel_path = os.path.relpath(filepath, root_dir)
+                
+                # Determine Markdown language
+                md_lang = LANG_MAP.get(ext, ext.replace(".", ""))
+
                 try:
-                    content = content.decode("utf-8-sig")  # Try UTF-8 with BOM
-                except UnicodeDecodeError:
-                    content = content.decode("latin-1",
-                                             errors="replace")  # Fallback to Latin-1 and replace undecodable characters
-                if content.startswith('\ufeff'):  # Check for BOM
-                    content = content[3:]  # Remove BOM if present
-                combined_text += content
-                combined_text += "\n"
+                    with open(filepath, "rb") as f:
+                        raw_data = f.read()
+                        
+                    # Decode
+                    try:
+                        content = raw_data.decode("utf-8-sig")
+                    except UnicodeDecodeError:
+                        content = raw_data.decode("latin-1", errors="replace")
 
-    return file_added, combined_text
+                    # Skip binary files that accidentally matched
+                    if '\0' in content: continue
 
+                    # --- BUILD MARKDOWN OUTPUT ---
+                    output_content += f"## File: {rel_path}\n"
+                    output_content += f"```{md_lang}\n"
+                    output_content += content
+                    output_content += f"\n```\n\n"
+
+                    # Add to stats
+                    file_list.append(rel_path)
+                    total_files += 1
+                    total_bytes += len(raw_data)
+                    print(f"Added: {rel_path}")
+
+                except Exception as e:
+                    print(f"\033[91mFailed to read {rel_path}: {e}\033[0m")
+
+    # --- APPEND PROJECT STRUCTURE (Like the Bash script) ---
+    if total_files > 0:
+        output_content += "\n_Project Structure:_\n"
+        output_content += "```text\n"
+        for path in sorted(file_list):
+            output_content += f"{path}\n"
+        output_content += "```\n"
+
+    return total_files, total_bytes, output_content
 
 if __name__ == "__main__":
-    print(__file__)
-    this_base_name = os.path.basename(__file__)
-    print(this_base_name)
-    # take all files with the same extension as the current file .py
-    file_extensions = set(this_base_name.split(".")[1:-1])
-    print(file_extensions)
-    file_added, combined_text = combine_files_to_clipboard(os.getcwd(), file_extensions, this_base_name)
-    pyperclip.copy(combined_text)
-    print(f"Combined length: {len(combined_text)} from all {file_extensions} total:{file_added} files copied to clipboard!")
+    # Setup
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    target_exts = get_target_extensions()
+
+    if not target_exts:
+        print("\033[93mWARNING: No extensions found in filename!\033[0m")
+        print("Rename this file like: 'copy.cs.xml.py'")
+        input("Press Enter to exit...")
+    else:
+        # Run
+        start_time = time.time()
+        count, size, text = process_directory(script_dir, target_exts)
+        
+        if count > 0:
+            pyperclip.copy(text)
+            
+            # Calculate stats
+            human_size = format_size(size)
+            # Rough token estimate (1 token ~= 4 chars)
+            tokens = len(text) // 4 
+            
+            # Print Fancy Success Message (Green)
+            print("-" * 50)
+            print(f"\033[92m✔ Success! Copied to clipboard.\033[0m")
+            print(f"  Files:  \033[1m{count}\033[0m")
+            print(f"  Size:   \033[1m{human_size}\033[0m")
+            print(f"  Tokens: \033[1m~{tokens}\033[0m (LLM Context)")
+            print("-" * 50)
+        else:
+            print("\033[93mNo matching files found.\033[0m")
+
+        input("\nPress Enter to close...")
