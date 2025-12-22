@@ -1,6 +1,8 @@
 import os
 import sys
 import time
+import argparse
+from pathlib import Path
 
 # Try to import pyperclip
 try:
@@ -45,17 +47,34 @@ def format_size(bytes_size):
         bytes_size /= 1024.0
     return f"{bytes_size:.2f} TB"
 
-def process_directory(root_dir, target_exts):
+def process_directory(root_dir, target_exts, exclude_paths=None):
     output_content = ""
     file_list = [] # For the "Project Structure" section
     total_files = 0
     total_bytes = 0
+    
+    # Normalize exclude paths to absolute paths
+    excluded_dirs = set()
+    if exclude_paths:
+        for exclude in exclude_paths:
+            abs_path = os.path.abspath(os.path.join(root_dir, exclude))
+            excluded_dirs.add(abs_path)
 
     print(f"\033[96mScanning: {root_dir}...\033[0m") # Cyan text
+    if excluded_dirs:
+        print(f"\033[93mExcluding: {', '.join(exclude_paths)}\033[0m")
     
     for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Check if current directory should be excluded
+        abs_dirpath = os.path.abspath(dirpath)
+        if any(abs_dirpath.startswith(excluded) for excluded in excluded_dirs):
+            dirnames[:] = []  # Don't descend into this directory
+            continue
+            
         # Filter directories in-place
-        dirnames[:] = [d for d in dirnames if d not in IGNORE_FOLDERS]
+        dirnames[:] = [d for d in dirnames 
+                      if d not in IGNORE_FOLDERS 
+                      and os.path.abspath(os.path.join(dirpath, d)) not in excluded_dirs]
         
         for filename in filenames:
             # Skip this script
@@ -117,6 +136,28 @@ def process_directory(root_dir, target_exts):
     return total_files, total_bytes, output_content
 
 if __name__ == "__main__":
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description="Copy files with specific extensions to clipboard",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python copy.cs.md.py.py                          # Copy all files
+  python copy.cs.md.py.py --exclude test           # Exclude 'test' folder
+  python copy.cs.md.py.py --exclude test docs      # Exclude multiple folders
+  python copy.cs.md.py.py -e node_modules -e dist  # Short flag
+        """
+    )
+    parser.add_argument(
+        '--exclude', '-e',
+        action='append',
+        default=[],
+        metavar='PATH',
+        help='Exclude a folder or path (can be used multiple times)'
+    )
+    
+    args = parser.parse_args()
+    
     # Setup
     script_dir = os.path.dirname(os.path.abspath(__file__))
     target_exts = get_target_extensions()
@@ -128,7 +169,7 @@ if __name__ == "__main__":
     else:
         # Run
         start_time = time.time()
-        count, size, text = process_directory(script_dir, target_exts)
+        count, size, text = process_directory(script_dir, target_exts, args.exclude)
         
         if count > 0:
             pyperclip.copy(text)
